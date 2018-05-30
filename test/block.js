@@ -223,6 +223,22 @@ inputs.forEach(function (e) {
             next[k] = true
             hops = reachable(_g, e.max||2, _hops, next, hops)
           }
+          else if (false) {
+            /*
+              I had thought that maybe I could recalculate
+              just the paths to K, when someone blocked K,
+              but we'd need to recalculate the paths out of K too.
+              If we had two way links on our graph structure
+              something like this would work. but not one way.
+            */
+            //console.log("REFLOW", j, k, g[j][k])
+            delete hops[k]
+            for(var i in g) {
+              if(g[i][k] != null) {
+                reachable.update(_g, e.max||2, hops, _hops, i, k)
+              }
+            }
+          }
           else {
             next = {a:true}
             var hops2 = _hops
@@ -234,7 +250,6 @@ inputs.forEach(function (e) {
                 hops[k] = null
           }
 
-//          var hops = reachable(_g, e.max||2, _hops, next, {})
           console.log('patch', hops)
           t.deepEqual(merge(hops, _hops), e.hops)
         }
@@ -243,6 +258,11 @@ inputs.forEach(function (e) {
     })
 
 })
+
+
+
+
+
 
 
 
