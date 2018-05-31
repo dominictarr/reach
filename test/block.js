@@ -4,6 +4,7 @@ var tape = require('tape')
 var block = require('../block')
 var inject = require('../').inject
 var reachable = inject(block.reduce, block.update, block.expand)
+var realtime = require('../realtime')
 
 tape('add', function (t) {
   var equal = t.deepEqual
@@ -188,6 +189,10 @@ var inputs = [
 
 ]
 
+function clone (obj) {
+  return JSON.parse(JSON.stringify(obj))
+}
+
 inputs.forEach(function (e) {
   if(e)
     tape('traverse:'+(e.name || JSON.stringify(e.graph)), function (t) {
@@ -215,18 +220,13 @@ inputs.forEach(function (e) {
       var g = e.graph
       var full = {a: [0,null,0]}
       full = reachable(e.graph, e.max || 2, full, full, 'a')
-      console.log('full:', full)
       for(var j in g) {
         for(var k in g[j]) {
-          console.log('---')
-          console.log(g)
-          var _g = JSON.parse(JSON.stringify(g))
+          var _g = clone(g)
           delete _g[j][k]
           var h = {a:[0,null,0]}
           var _hops = reachable(_g, e.max || 2, h, h, 'a')
-          console.log('part:', _hops)
-          console.log('edge:', j,k,g[j][k])
-          t.deepEqual(h.a, [0,null, 0])
+          t.deepEqual(h.a, [0, null, 0])
           _g[j][k]=g[j][k]
           var hops = {}
           if(g[j][k] >= 0 && reachable.update(_g, e.max||2, _hops, hops, j, k)) {
@@ -240,7 +240,6 @@ inputs.forEach(function (e) {
               If we had two way links on our graph structure
               something like this would work. but not one way.
             */
-            //console.log("REFLOW", j, k, g[j][k])
             delete hops[k]
             for(var i in g) {
               if(g[i][k] != null) {
@@ -267,5 +266,28 @@ inputs.forEach(function (e) {
     })
 })
 
+inputs.forEach(function (e) {
+  if(e)
+    tape('realtime partial:'+e.name, function (t) {
+      var g = e.graph
+      var full = {a: [0,null,0]}
+      var start = 'a'
+      full = reachable(e.graph, e.max || 2, full, full, start)
+      for(var j in g) {
+        for(var k in g[j]) {
+          var _g = clone(g)
+          delete _g[j][k]
+          var _hops = clone(realtime(_g, e.max || 2, {}, start))
 
+          t.deepEqual(_hops.a, [0, null, 0])
+          _g[j][k]=g[j][k]
+          var hops = realtime(_g, e.max || 2, _hops, start, j, k)
+
+          console.log('patch', hops)
+          t.deepEqual(_hops, e.hops)
+        }
+      }
+      t.end()
+    })
+})
 
