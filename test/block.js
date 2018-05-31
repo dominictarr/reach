@@ -39,7 +39,7 @@ tape('reachable', function (t) {
       a: {b: 1},
     },
     2,
-    {a:[0,null,null]},
+    {a:[0,null,0]},
     {},
     'a'
     ), {b: [1,null, 1]})
@@ -53,7 +53,7 @@ var inputs = [
       a: {b: 1}
     },
     hops: {
-      a: [0,null,null], //should a[2] be 0?
+      a: [0,null,0], //should a[2] be 0?
       b: [1,null,1]
     }
   },
@@ -65,7 +65,7 @@ var inputs = [
     },
     max: 3,
     hops: {
-      a: [0,null,null],
+      a: [0,null,0],
       b: [1,null,1],
       c: [2,null,2]
     }
@@ -79,7 +79,7 @@ var inputs = [
     },
     max: 3,
     hops: {
-      a: [0,null,null],
+      a: [0,null,0],
       b: [1,null,1],
       c: [null,1,null]
     }
@@ -93,7 +93,7 @@ var inputs = [
     },
     max: 3,
     hops: {
-      a: [0,null,null],
+      a: [0,null,0],
       b: [1,null,1],
       c: [null,1,null]
     }
@@ -107,7 +107,7 @@ var inputs = [
     },
     max: 3,
     hops: {
-      a: [0,null,null],
+      a: [0,null,0],
       b: [1,null,1],
       c: [2,0,2]
     }
@@ -121,7 +121,7 @@ var inputs = [
     },
     max: 3,
     hops: {
-      a: [0,null,null],
+      a: [0,null,0],
       b: [1,null,1],
       c: [2,0,2]
     }
@@ -135,7 +135,7 @@ var inputs = [
     },
     max: 3,
     hops: {
-      a: [0,null,null],
+      a: [0,null,0],
       b: [1,null,1],
       c: [2,null,2],
       d: [3,null, 3]
@@ -150,7 +150,7 @@ var inputs = [
     },
     max: 3,
     hops: {
-      a: [0,null,null],
+      a: [0,null,0],
       b: [1,null,1],
       c: [1,null,1],
       d: [2,null,2],
@@ -165,12 +165,27 @@ var inputs = [
     },
     max: 3,
     hops: {
-      a: [0,null,null],
+      a: [0,null,0],
       b: [1,null,1],
       c: [1,1,1],
       d: [2, null, 2]
     }
   },
+  {
+    name: 'clique',
+    graph: {
+      a: {b: 1, c:1, a:1},
+      b: {a: 1, c: 1},
+      c: {a: 1, b: 1},
+    },
+    max: 3,
+    hops: {
+      a: [0,null,0],
+      b: [1,null,1],
+      c: [1,null,1],
+    }
+  },
+
 ]
 
 inputs.forEach(function (e) {
@@ -178,7 +193,7 @@ inputs.forEach(function (e) {
     tape('traverse:'+(e.name || JSON.stringify(e.graph)), function (t) {
       console.log(e.graph)
       var h =
-        {a: [0,null,null]}
+        {a: [0,null,0]}
       var output = reachable(
         e.graph, e.max || 2, h, h, 'a'
       )
@@ -198,7 +213,7 @@ inputs.forEach(function (e) {
   if(e)
     tape('traverse partial:'+e.name, function (t) {
       var g = e.graph
-      var full = {a: [0,null,null]}
+      var full = {a: [0,null,0]}
       full = reachable(e.graph, e.max || 2, full, full, 'a')
       console.log('full:', full)
       for(var j in g) {
@@ -207,11 +222,11 @@ inputs.forEach(function (e) {
           console.log(g)
           var _g = JSON.parse(JSON.stringify(g))
           delete _g[j][k]
-          var h = {a:[0,null,null]}
+          var h = {a:[0,null,0]}
           var _hops = reachable(_g, e.max || 2, h, h, 'a')
           console.log('part:', _hops)
           console.log('edge:', j,k,g[j][k])
-          t.deepEqual(h.a, [0,null, null])
+          t.deepEqual(h.a, [0,null, 0])
           _g[j][k]=g[j][k]
           var hops = {}
           if(g[j][k] >= 0 && reachable.update(_g, e.max||2, _hops, hops, j, k)) {
@@ -236,7 +251,7 @@ inputs.forEach(function (e) {
           else {
             next = {a:true}
             var hops2 = _hops
-            hops = {a:[0,null, null]}
+            hops = {a:[0,null, 0]}
             hops = reachable(_g, e.max||2, hops, hops, 'a')
             //diff
             for(var k in _hops)
