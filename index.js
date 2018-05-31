@@ -56,20 +56,19 @@ function inject (reduce, update, expand) {
   }
 
   alg.update = _update
+  alg2.update = _update
 
-  return alg
+  return alg2
 
   //I also tried this with various random graphs and especially on very very large graphs
   //the above was faster. (but is only feasibly on recent node were delete is fast!)
 
-  function alg2 (g, max, _hops, next, hops) {
+  function alg2 (g, max, _hops, hops, start) {
     hops = hops || _hops
-    var queue = Object.keys(next)
+    var queue = [start]
     var l = 0
     while(l < queue.length) {
       var j = queue[l++]
-      if(hops[j] == null)
-        hops[k] = next[j]
       for(var k in g[j]) {
         if(_update(g, max, _hops, hops, j, k))
           queue.push(k)
@@ -82,4 +81,7 @@ function inject (reduce, update, expand) {
 
 module.exports = inject(reduce, update, expand)
 module.exports.inject = inject
+
+
+
 
