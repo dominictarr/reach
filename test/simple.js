@@ -12,13 +12,15 @@ tape('simple', function (t) {
   },
   2,
   {a:0},
-  {a:0}
+  {a:0},
+  'a'
   )
 
   t.deepEqual(hops, {a: 0, b: 1, c:2})
   t.end()
 
 })
+
 
 
 

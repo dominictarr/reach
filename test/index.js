@@ -8,7 +8,7 @@ tape('simple', function (t) {
   var h = {a: 0}
   var a = traverse({
     a: {b: 1}
-  }, 3, h, {a:0})
+  }, 3, h, h, 'a')
   t.deepEqual(h, {a: 0, b: 1})
   t.end()
 })
@@ -27,7 +27,6 @@ function random (N, K) {
 function counts (hops) {
   var counts = {}
   for(var k in hops)
-//    if(!counts[hops[k]])
       counts[hops[k]] = (counts[hops[k]] || 0) + 1
   return counts
 }
@@ -35,7 +34,8 @@ function counts (hops) {
 tape('bench', function (t) {
   var g = random(10000, 350)
   var start = Date.now()
-  var hops = traverse(g, 10, {"0": 0}, {"0": 0})
+  var h = {"0": 0}
+  var hops = traverse(g, 10, h, h, '0')
   console.log(Date.now()-start)
   console.log(counts(hops))
   t.end()
@@ -44,7 +44,8 @@ tape('bench', function (t) {
 tape('bench', function (t) {
   var g = random(100000, 5)
   var start = Date.now()
-  var hops = traverse(g, 10, {"0": 0}, {"0": 0})
+  var h = {"0": 0}
+  var hops = traverse(g, 10, h, h, '0')
   console.log(Date.now()-start)
   console.log(counts(hops))
   t.end()

@@ -39,8 +39,10 @@ function inject (reduce, update, expand) {
     }
   }
 
-  function alg (g, max, _hops, next, hops) {
+  function alg (g, max, _hops, hops, start) {
     hops = hops || _hops
+    var next = {}
+    next[start] = true
     while(!isEmpty(next)) {
       for(var j in next) {
         for(var k in g[j]) {
@@ -55,7 +57,7 @@ function inject (reduce, update, expand) {
 
   alg.update = _update
 
-//  return alg
+  return alg
 
   //I also tried this with various random graphs and especially on very very large graphs
   //the above was faster. (but is only feasibly on recent node were delete is fast!)
@@ -76,11 +78,8 @@ function inject (reduce, update, expand) {
     return hops
   }
 
-  return alg
 }
 
 module.exports = inject(reduce, update, expand)
 module.exports.inject = inject
-
-
 
