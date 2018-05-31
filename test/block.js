@@ -214,7 +214,7 @@ inputs.forEach(function (e) {
           t.deepEqual(h.a, [0,null, null])
           _g[j][k]=g[j][k]
           var hops = {}
-          if(g[j][k] >= 0 && reachable.update(_g, e.max||2, hops, _hops, j, k)) {
+          if(g[j][k] >= 0 && reachable.update(_g, e.max||2, _hops, hops, j, k)) {
             hops = reachable(_g, e.max||2, _hops, hops, k)
           }
           else if (false) {
@@ -229,7 +229,7 @@ inputs.forEach(function (e) {
             delete hops[k]
             for(var i in g) {
               if(g[i][k] != null) {
-                reachable.update(_g, e.max||2, hops, _hops, i, k)
+                reachable.update(_g, e.max||2, _hops, hops, i, k)
               }
             }
           }

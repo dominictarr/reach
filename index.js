@@ -28,7 +28,7 @@ function expand (value, max) {
 
 function inject (reduce, update, expand) {
 
-  function _update (g, max, hops, _hops, j, k) {
+  function _update (g, max, _hops, hops, j, k) {
     var src = defined(hops[j], _hops[j])
     if(!expand(src, max)) return false
     var dst = defined(hops[k], _hops[k])
@@ -46,7 +46,7 @@ function inject (reduce, update, expand) {
     while(!isEmpty(next)) {
       for(var j in next) {
         for(var k in g[j]) {
-          if(_update(g, max, hops, _hops, j, k))
+          if(_update(g, max, _hops, hops, j, k))
             next[k] = true
         }
         delete next[j]
@@ -71,7 +71,7 @@ function inject (reduce, update, expand) {
       if(hops[j] == null)
         hops[k] = next[j]
       for(var k in g[j]) {
-        if(_update(g, max, hops, _hops, j, k))
+        if(_update(g, max, _hops, hops, j, k))
           queue.push(k)
       }
     }
