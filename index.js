@@ -33,7 +33,6 @@ function inject (reduce, update, expand) {
     if(!expand(src, max)) return false
     var dst = defined(hops[k], _hops[k])
     var _new = reduce(src, dst, g[j][k])
-    console.log(j,k, src, dst, _new)
     if(update(_new, dst)) {
       hops[k] = _new
       return expand(_new, max)
@@ -82,5 +81,6 @@ function inject (reduce, update, expand) {
 
 module.exports = inject(reduce, update, expand)
 module.exports.inject = inject
+
 
 
