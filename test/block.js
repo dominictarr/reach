@@ -4,7 +4,7 @@ var tape = require('tape')
 var block = require('../block')
 var inject = require('../').inject
 var reachable = inject(block.reduce, block.update, block.expand)
-var realtime = require('../realtime')
+var realtime = require('../realtime')(block)
 
 tape('add', function (t) {
   var equal = t.deepEqual
@@ -196,9 +196,7 @@ function clone (obj) {
 inputs.forEach(function (e) {
   if(e)
     tape('traverse:'+(e.name || JSON.stringify(e.graph)), function (t) {
-      console.log(e.graph)
-      var h =
-        {a: [0,null,0]}
+      var h = {a: [0,null,0]}
       var output = reachable(
         e.graph, e.max || 2, h, h, 'a'
       )
@@ -258,7 +256,6 @@ inputs.forEach(function (e) {
                 hops[k] = null
           }
 
-          console.log('patch', hops)
           t.deepEqual(merge(hops, _hops), e.hops)
         }
       }
