@@ -85,7 +85,6 @@ exports.min = function (a, b) {
 }
 
 exports.reduce = function (src, dst, val) {
-  console.log(src, dst, val)
   return exports.min(exports.add(src, val), dst)
 }
 
@@ -103,7 +102,9 @@ exports.expand = function (dst, max) {
     blockHops(dst) != 0
   )
 }
-
-
-
-
+exports.initial = function () {
+  return [0, null, 0]
+}
+exports.isRemove = function (value) {
+  return value < 0
+}
