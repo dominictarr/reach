@@ -45,17 +45,13 @@ if an update was made and there are thus more edges to expand.
 if so, call `traverser(graph, max, old_hops, new_hops, start=to)`
 
 
-### traverse(graph, 
 
-the `traverser` takes a graph, and some parameters such as
-a `max` and a `start` point, and calculates (or updates)
-a `hops` object. The hops object is a mapping from node ids to hop
-states.
+## options
 
-The simplest design would be for hop state to be a integer
-which defined the shortest path distance from the start to that node,
-however to represent same-as and block, the hop state is a
-3-tuple of `[in_hop_dist, out_hop_dist, block_dist]`
+The way that traverser works is defined by an options object.
+Two options are provided: `reach/simple` which uses a positive
+integer to track hop distance. And `reach/block` which can represent blocks,
+same-as and follow but not follow foafs, using a 3-tuple of `[in_hop_dist, out_hop_dist, block_dist]`
 
 ### reduce (src_state, dest_state, change) => new_state
 
@@ -76,11 +72,21 @@ If `new_state` is considered less than `max` return true,
 which causes the traverser continue expanding
 paths from this node.
 
+### isRemove (change)
 
+returns true if this `change` will remove an edge.
+
+### initial ()
+
+returns the representation for `start`.
 
 ## License
 
 MIT
+
+
+
+
 
 
 
