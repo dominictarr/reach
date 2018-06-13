@@ -88,14 +88,15 @@ exports.reduce = function (src, dst, val) {
   return exports.min(exports.add(src, val), dst)
 }
 
-exports.update = function (_dst, dst) {
+
+exports.isUpdate = function (_dst, dst) {
   return !equal(_dst, dst)
 }
 
 function asNumber (n) {
   return n == null ? Infinity : n
 }
-exports.expand = function (dst, max) {
+exports.isExpand = function (dst, max) {
   return (
     toHops(dst) < max &&
     asNumber(toHops(dst)) <= asNumber(blockHops(dst)) &&

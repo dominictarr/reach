@@ -2,9 +2,8 @@
 
 var tape = require('tape')
 var block = require('../block')
-var inject = require('../').inject
-var reachable = inject(block.reduce, block.update, block.expand)
-var realtime = require('../realtime')(block)
+var r = require('../')(block)
+//var realtime = require('../realtime')(block)
 
 tape('add', function (t) {
   var equal = t.deepEqual
@@ -30,13 +29,13 @@ tape('min', function (t) {
 })
 
 tape('expand', function (t) {
-  t.equal(block.expand([1,1,1], 2), true)
-  t.equal(block.expand([1,0,1], 2), false)
+  t.equal(block.isExpand([1,1,1], 2), true)
+  t.equal(block.isExpand([1,0,1], 2), false)
   t.end()
 })
 
 tape('reachable', function (t) {
-  t.deepEqual(reachable({
+  t.deepEqual(r.traverse({
       a: {b: 1},
     },
     2,
@@ -196,8 +195,8 @@ function clone (obj) {
 inputs.forEach(function (e) {
   if(e)
     tape('traverse:'+(e.name || JSON.stringify(e.graph)), function (t) {
-      var h = {a: [0,null,0]}
-      var output = reachable(
+      var h = {a: block.initial()}
+      var output = r.traverse(
         e.graph, e.max || 2, h, h, 'a'
       )
       t.deepEqual(output, e.hops)
@@ -219,20 +218,20 @@ inputs.forEach(function (e) {
     tape('traverse partial:'+e.name, function (t) {
       var g = e.graph
       var full = {a: [0,null,0]}
-      full = reachable(e.graph, e.max || 2, full, full, 'a')
+      full = r.traverse(e.graph, e.max || 2, full, full, 'a')
       for(var j in g) {
         for(var k in g[j]) {
           var _g = clone(g)
           delete _g[j][k]
           var h = {a:block.initial()}
 
-          var _hops = reachable(_g, e.max || 2, h, h, 'a')
+          var _hops = r.traverse(_g, e.max || 2, h, h, 'a')
           t.deepEqual(h.a, block.initial())
           _g[j][k]=g[j][k]
 
           var hops = {}
-          if(g[j][k] >= 0 && reachable.update(_g, e.max||2, _hops, hops, j, k)) {
-            hops = reachable(_g, e.max||2, _hops, hops, k)
+          if(g[j][k] >= 0 && r.update(_g, e.max||2, _hops, hops, j, k)) {
+            hops = r.traverse(_g, e.max||2, _hops, hops, k)
           }
           else if (false) {
             /*
@@ -245,7 +244,7 @@ inputs.forEach(function (e) {
             delete hops[k]
             for(var i in g) {
               if(g[i][k] != null) {
-                reachable.update(_g, e.max||2, _hops, hops, i, k)
+                r.update(_g, e.max||2, _hops, hops, i, k)
               }
             }
           }
@@ -253,7 +252,7 @@ inputs.forEach(function (e) {
             next = {a:true}
             var hops2 = _hops
             hops = {a:[0,null, 0]}
-            hops = reachable(_g, e.max||2, hops, hops, 'a')
+            hops = r.traverse(_g, e.max||2, hops, hops, 'a')
             //diff
             for(var k in _hops)
               if(!hops[k])
@@ -273,13 +272,13 @@ inputs.forEach(function (e) {
       var g = e.graph
       var full = {a: [0,null,0]}
       var start = 'a'
-      full = reachable(e.graph, e.max || 2, full, full, start)
+      full = r.traverse(e.graph, e.max || 2, full, full, start)
       for(var j in g) {
         for(var k in g[j]) {
           var _g = clone(g)
           delete _g[j][k]
           //calculate the hops before adding edge jk
-          var _hops = clone(realtime(_g, e.max || 2, {}, start))
+          var _hops = clone(r.realtime(_g, e.max || 2, {}, start))
           var __hops = clone(_hops)
 
           //check that _hops.a contains the start.
@@ -289,7 +288,7 @@ inputs.forEach(function (e) {
           _g[j][k]=g[j][k]
 
           //calculate the change in hops
-          var hops = realtime(_g, e.max || 2, _hops, start, j, k)
+          var hops = r.realtime(_g, e.max || 2, _hops, start, j, k)
 
           t.deepEqual(_hops, e.hops) //mutates old_hops
           console.log('patch', hops) //returns a patch.
@@ -301,6 +300,7 @@ inputs.forEach(function (e) {
       t.end()
     })
 })
+
 
 
 

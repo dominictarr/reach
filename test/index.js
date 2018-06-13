@@ -2,7 +2,8 @@
 
 var tape = require('tape')
 
-var traverse = require('../')
+
+var traverse = require('../')(require('../simple')).traverse
 
 tape('simple', function (t) {
   var h = {a: 0}
@@ -50,4 +51,7 @@ tape('bench', function (t) {
   console.log(counts(hops))
   t.end()
 })
+
+
+
 
