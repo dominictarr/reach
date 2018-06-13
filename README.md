@@ -22,9 +22,30 @@ but removing edges significantly less so)
 
 ## api
 
-## Inject(reduce, isUpdate, isExpand) => traverser
+## createReachable({reduce, isUpdate, isExpand, initial, isRemove) => {traverse, update, realtime}
 
-construct a `traverser` given a `reduce` `isUpdate` and `isExpand` function.
+construct a `traverser` given a set of options (`reduce`, `isUpdate`, `isExpand`, `initial`, and `isRemove`)
+functions.
+
+### traverser.realtime (graph, max, hops, start, j, k) => new_hops
+
+for a `graph`, a `max` setting, a `hops` object, the `start` and `j`->`k` of a just-added
+edge. returns `hops` that are now accessible with the addition of `j->k`.
+mutates `hops`, so when this returns `hops` will include `new_hops`
+
+### traverser.traverse (graph, max, old_hops, new_hops, start)
+
+beginning at `start`, traverse `graph` expanding `old_hops`
+up until `max`. The output is mutated `new_hops`.
+
+### traverser.update(graph, max, old_hops, new_hops, from, to) => boolean
+
+Expand a single edge `from`->`to` into `new_hops`. Returns true
+if an update was made and there are thus more edges to expand.
+if so, call `traverser(graph, max, old_hops, new_hops, start=to)`
+
+
+### traverse(graph, 
 
 the `traverser` takes a graph, and some parameters such as
 a `max` and a `start` point, and calculates (or updates)
@@ -55,21 +76,13 @@ If `new_state` is considered less than `max` return true,
 which causes the traverser continue expanding
 paths from this node.
 
-## traverser (graph, max, old_hops, new_hops, start)
-
-beginning at `start`, traverse `graph` expanding `old_hops`
-up until `max`. The output is mutated `new_hops`.
-
-## traverser.update(graph, max, old_hops, new_hops, from, to) => boolean
-
-Expand a single edge `from`->`to` into `new_hops`. Returns true
-if an update was made and there are thus more edges to expand.
-if so, call `traverser(graph, max, old_hops, new_hops, start=to)`
-
 
 
 ## License
 
 MIT
+
+
+
 
 
