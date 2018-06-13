@@ -212,6 +212,8 @@ function merge (a, b) {
   return b
 }
 
+//this test was for getting realtime.js right,
+//but now just use realtime.
 inputs.forEach(function (e) {
   if(e)
     tape('traverse partial:'+e.name, function (t) {
@@ -222,10 +224,12 @@ inputs.forEach(function (e) {
         for(var k in g[j]) {
           var _g = clone(g)
           delete _g[j][k]
-          var h = {a:[0,null,0]}
+          var h = {a:block.initial()}
+
           var _hops = reachable(_g, e.max || 2, h, h, 'a')
-          t.deepEqual(h.a, [0, null, 0])
+          t.deepEqual(h.a, block.initial())
           _g[j][k]=g[j][k]
+
           var hops = {}
           if(g[j][k] >= 0 && reachable.update(_g, e.max||2, _hops, hops, j, k)) {
             hops = reachable(_g, e.max||2, _hops, hops, k)
@@ -274,17 +278,33 @@ inputs.forEach(function (e) {
         for(var k in g[j]) {
           var _g = clone(g)
           delete _g[j][k]
+          //calculate the hops before adding edge jk
           var _hops = clone(realtime(_g, e.max || 2, {}, start))
+          var __hops = clone(_hops)
 
-          t.deepEqual(_hops.a, [0, null, 0])
+          //check that _hops.a contains the start.
+          t.deepEqual(_hops.a, block.initial())
+
+          //add jk to the test copy of the graph.
           _g[j][k]=g[j][k]
+
+          //calculate the change in hops
           var hops = realtime(_g, e.max || 2, _hops, start, j, k)
 
-          console.log('patch', hops)
-          t.deepEqual(_hops, e.hops)
+          t.deepEqual(_hops, e.hops) //mutates old_hops
+          console.log('patch', hops) //returns a patch.
+          //merging the patch into the copy of the original
+          //gives us the expected output.
+          t.deepEqual(merge(hops, __hops), e.hops)
         }
       }
       t.end()
     })
 })
+
+
+
+
+
+
 
