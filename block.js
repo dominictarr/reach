@@ -3,7 +3,7 @@
   0 == same-as
   1 >= hops to
   -1 == block
-  -2 <= follow, but ignore their friends
+  -2 <= follow, but ignore their friends *not implemented yet*
 
 or?
 
