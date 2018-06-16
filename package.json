@@ -9,6 +9,8 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "deep-merge": "^1.0.0",
+    "get-permutations": "^1.0.0",
     "tape": "^4.9.0"
   },
   "scripts": {
