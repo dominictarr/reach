@@ -39,14 +39,17 @@ function inject (opts) {
     return hops
   }
 
-  function realtime (g, max, _hops, start, j, k) {
+  function realtime (g, max, _hops, start, j, k, value) {
+    var oldValue = g[j] && g[j][k]
+    g[j] = g[j] || {}
+    g[j][k] = value
     var hops
     if(isEmpty(_hops)) {
       hops = _hops
       _hops[start] = [0, null, 0]
       return hops = traverse(g, max, _hops, hops, start)
     }
-    else if(!opts.isRemove(g[j][k])) {
+    else if(!opts.isCloser(value, oldValue)) {
       hops = {}
       //this could be refactored to process many edges in one go, but this works for now.
       if(update(g, max, _hops, hops, j, k))
@@ -83,6 +86,4 @@ function inject (opts) {
 }
 
 module.exports = inject
-
-
 
