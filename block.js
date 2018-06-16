@@ -61,7 +61,7 @@ exports.add = function (src, val) {
     return [add(fromHops(src), 1), null, -1]
   }
   else
-    throw new Error('invalid val')
+    throw new Error('invalid val:'+val)
 }
 
 function equal (a, b) {
@@ -106,6 +106,10 @@ exports.isExpand = function (dst, max) {
 exports.initial = function () {
   return [0, null, 0]
 }
-exports.isRemove = function (value) {
-  return value < 0
+exports.isRemove = function (value, _value) {
+  return value >= 0 ? value > _value : value <= -1
 }
+exports.isCloser = function (value, _value) {
+  return value >= 0 ? value > _value : value <= -1
+}
+
