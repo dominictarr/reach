@@ -13,6 +13,7 @@ function inject (opts) {
 
   function update (g, max, _hops, hops, j, k) {
     var src = defined(hops[j], _hops[j])
+    if(src == undefined) return false
     if(!opts.isExpand(src, max)) return false
     var dst = defined(hops[k], _hops[k])
     var _new = opts.reduce(src, dst, g[j][k])
@@ -82,8 +83,6 @@ function inject (opts) {
 }
 
 module.exports = inject
-
-
 
 
 
