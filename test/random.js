@@ -12,11 +12,12 @@ function random (n, f, relations) {
   var g = {}
   for(var i = 0; i < n; i++) {
     var a = letters[i]
-    g[a] = g[a] || {}
     for(var j = 0; j < f; j++) {
       var b = letters[~~(randomFloat() * n)]
-      if(b != a)
+      if(b != a) {
+        g[a] = g[a] || {} //don't create empty nodes
         g[a][b] = relations[~~(Math.pow(randomFloat(), 2)*relations.length)]
+      }
     }
   }
   return g
@@ -30,9 +31,23 @@ function eachEdge(g, iter) {
     for(var k in g[j])
       iter(j, k, g[j][k])
 }
+
+function Graph (start, max) {
+  var g = {}
+  var hops = {}
+  g[start] = {}
+  hops[start] = r.initial()
+  return {
+    graph: g,
+    hops: hops,
+    add: function (j, k, v) {
+      return r.realtime(g, max, hops, start, j, k, v)
+    }
+  }
+}
 function test (t, g, g_) {
   var g2 = {}, hops = {}
-//  console.log(r.traverse(g, 3, {}, {a: [0, null, 0]}, 'a'))
+  var _g = JSON.parse(JSON.stringify(g))
   console.log(JSON.stringify(g))
   //add each edge, and check that it's consistent with the incremental hops
   eachEdge(g, function (j, k, v) {
@@ -46,16 +61,46 @@ function test (t, g, g_) {
     //merge in a second graph, because we need to test updates!
     console.log(JSON.stringify(g_))
     eachEdge(g_, function (j, k, v) {
-      g[j] = g[j] || {}
-      g[j][k] = g_[j][k]
+      _g[j] = _g[j] || {} //merge into copy of g
+      _g[j][k] = v
 
       r.realtime(g2, 3, hops, 'a', j, k, v)
-      t.deepEqual(hops, r.traverse(g2, 3, {}, {a: [0, null, 0]}, 'a'))
+      t.deepEqual(g2, _g)
+      t.deepEqual(hops, r.traverse(_g, 3, {}, {a: [0, null, 0]}, 'a'))
     })
-  console.log(hops)
-  t.deepEqual(hops, r.traverse(g, 3, {}, {a: [0, null, 0]}, 'a'))
+    t.deepEqual(hops, r.traverse(_g, 3, {}, {a: [0, null, 0]}, 'a'))
   }
 }
+
+function test2 (t, g, g_) {
+  var g2 = {}
+  var G = Graph('a', 3)
+  //add each edge, and check that it's consistent with the incremental hops
+  eachEdge(g, function (j, k, v) {
+    g2[j] = g2[j] || {}
+    g2[j][k] = v
+    G.add(j, k, v)
+    t.deepEqual(G.graph, g2)
+    t.deepEqual(G.hops, r.traverse(g2, 3, {}, {a: [0, null, 0]}, 'a'))
+  })
+
+  t.deepEqual(G.hops, r.traverse(g, 3, {}, {a: [0, null, 0]}, 'a'))
+//  return
+  if(g_) {
+    //merge in a second graph, because we need to test updates!
+    eachEdge(g_, function (j, k, v) {
+      g2[j] = g2[j] || {}
+      g2[j][k] = v
+      G.add(j, k, v)
+      t.deepEqual(G.graph, g2, 'graphs match')
+      t.deepEqual(G.hops, r.traverse(g2, 3, {}, {a: [0, null, 0]}, 'a'), 'incremental matches traversal')
+    })
+    t.deepEqual(G.hops, r.traverse(g2, 3, {}, {a: [0, null, 0]}, 'a'))
+  }
+}
+
+
+module.exports = function (test) {
 
 tape('simple, follow only', function (t) {
   test(t, random(3, 2, [1]))
@@ -108,7 +153,9 @@ tape('unfollow', function (t) {
 })
 
 
+}
 
-
+module.exports(test)
+//module.exports(test2)
 
 
